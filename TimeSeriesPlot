@@ -1,0 +1,21 @@
+---
+title: "timeSeriesPLot"
+author: "Chetana Katpally"
+date: "Monday, March 09, 2015"
+output: html_document
+---
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+
+```{r, echo=FALSE, message=FALSE}
+library(dygraphs)
+library(xts)
+datetimes <- seq.POSIXt(as.POSIXct("2015-01-01", tz="GMT"),
+                       +                         as.POSIXct("2015-01-02", tz="GMT"), by="10 min")
+values <- rnorm(length(datetimes))
+series <- xts(values, order.by = datetimes, tz="GMT")
+dygraph(series) %>% 
+   dyOptions(useDataTimezone = TRUE)
+```
