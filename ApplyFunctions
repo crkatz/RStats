@@ -1,0 +1,45 @@
+applyFunctions <- function(directory, pollutant, id)
+{
+  currWD <- paste("C:/Projects/Data", directory, sep='/')
+  fileList <- sort(list.files(currWD, full.names = TRUE, recursive = TRUE))
+  files <- list()
+
+  for (i in 1:length(id))
+  {
+    filename <- paste(sprintf('%03d', id[i]), ".csv", sep='')
+    files <- c(grep(filename, fileList, value = TRUE), files)
+    
+  }
+  
+  #print (files)
+  
+  dataset <- lapply(files, read.csv)
+  mydata <- do.call(rbind, dataset)
+  mydata <- as.data.frame(mydata)
+  #print (tail(mydata,10))
+  
+  
+  if (pollutant == 'nitrate')
+  {
+    #below is 2 ways of calculating mean. With and without apply
+    
+    #1 method
+    meanvalue <- apply(subset(mydata, select = nitrate), 2, mean, na.rm=TRUE)
+    
+    #2 method
+    #print (round(mean(mydata$nitrate, na.rm=TRUE), 3))
+    
+  }
+  else if(pollutant =='sulfate')
+  {
+    #print (round(mean(mydata$sulfate, na.rm=TRUE), 3))
+    meanvalue <- apply(subset(mydata, select = sulfate), 2, mean, na.rm=TRUE)
+    
+  }
+  
+  meanvalue <- round(meanvalue, 3)
+  #print(class(meanvalue))
+  print (meanvalue)
+  
+  
+}
