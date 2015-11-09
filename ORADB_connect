@@ -1,0 +1,29 @@
+ORAdbConnect <- function()
+{
+  Sys.setenv(JAVA_HOME="")
+  #options(java.parameters="-Xmx1g")
+  library(rJava)
+  .jinit()
+  
+  print(.jcall("java/lang/System", "S", "getProperty", "java.version"))
+  
+  
+  
+  library(RJDBC)
+  #Create connection driver and open connection
+  jdbcDriver = JDBC(driverClass="oracle.jdbc.OracleDriver", classPath="C:/Softwares/RDrivers/ojdbc6.jar")
+  
+  print (jdbcDriver)
+  jdbcConnection = RJDBC::dbConnect(jdbcDriver,"jdbc_url","uname","passwd")
+ 
+ print (jdbcConnection)
+ #return (jdbcConnection)
+ dbDisconnect(jdbcConnection) 
+}
+
+
+ORAdbDisconnect <- function(jdbcConnection)
+{
+  #Close connection
+  dbDisconnect(jdbcConnection)  
+}
