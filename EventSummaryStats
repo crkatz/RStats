@@ -1,0 +1,48 @@
+summaryAutomation <- function(fPathName)
+{
+  #Read table with header, skip lines, read data type as is
+  mydata <-  read.csv(fPathName, as.is=TRUE, header=F)
+  colnames(mydata) = c("StartTrans", "EndTrans", "Browser", "Env", "Time", "RespTime")
+  #paste row vaulues by specific column
+  dimval = dim(mydata)
+  cat ("\nThe #rows is ", print(dimval[1]), "and #columns is ", print(dimval[2]), "\n\n")
+  #subset needed columns
+  mydata = mydata[, which(names(mydata) %in% c("StartTrans", "RespTime"))]
+  mydata=na.omit(mydata)
+  #print (head(mydata))
+  #split data set by transaction type
+  test = split(mydata$RespTime, mydata$StartTrans)
+  #50th and 95th percentile transaction response time
+  test1 = t(as.data.frame(sapply(test, quantile, probs = c(.50,.90))))
+  #mean of the transaction response time
+  test2 = as.data.frame(sapply(test, mean))
+  respTime = cbind(round(test1/1000,2), round(test2/1000,2))
+  colnames(respTime) = c("Median", "90th-Percentile", "Average")
+  print(respTime)
+  fname = paste("filename_without_extension",Sys.Date(),".csv", sep="")
+  write.csv(respTime, fname)
+}
+summaryProdCounts <- function(fPathName)
+{
+  #Read table with header, skip lines, read data type as is
+  mydata <-  read.csv(fPathName, as.is=TRUE, header=T)
+  #paste row vaulues by specific column
+  dimval = dim(mydata)
+  cat ("\nThe #rows is ", print(dimval[1]), "and #columns is ", print(dimval[2]), "\n\n")
+  #subset needed columns
+  mydata = mydata[, which(names(mydata)%in% c("DISPLAY_NAME", "EVENT_CNT"))]
+  mydata=na.omit(mydata)
+  #print (head(mydata))
+  #split data set by transaction type
+  test = split(mydata$EVENT_CNT, mydata$DISPLAY_NAME)
+  #apply max function
+  test1 = as.data.frame(sapply(test, max))
+  #col bin test counts by a factor of server ratio
+  respTime = cbind(test1, round(test1*6/16))
+  colnames(respTime) = c("ProdCnts", "TestCnts")
+  respTime = respTime[order(-respTime[,1]),]
+  print(head(respTime))
+  fname = paste("filename_without_extension",Sys.Date(),".csv", sep="")
+  write.csv(respTime, fname)
+  
+}
