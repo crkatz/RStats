@@ -1,0 +1,37 @@
+summary <- function()
+{
+  #Read table with header, skip lines, read data type as is
+  mydata <- read.table("filename.txt", header=TRUE, skip=2, as.is=TRUE)
+  #paste row vaulues by specific column
+  dimval = dim(mydata)
+  cat ("\nThe #rows is ", print(dimval[1]), "and #columns is ", print(dimval[2]), "\n\n")
+  mydata <- within(mydata,  time <- paste(mydata[,1], mydata[,2], sep=" "))
+  #subset needed columns
+  mydata <- mydata[,-1:-2]
+  #print (head(mydata))
+  #eliminate redundant data
+  mydata <- mydata[mydata$PID !="PID",]  # For II
+  #mydata <- mydata[mydata$CPU !="CPU",]# For LM
+  mydata <- mydata[mydata$CPU !="all",]
+  print (head(mydata))
+  
+  #get counts of PID (vs) CPU for plotting
+  counts <- table(mydata$PID, mydata$CPU) # For II
+  #counts <- table(mydata$X.user, mydata$CPU) # For LM
+  print(counts)
+  barplot(counts, main="Processor Distribution for each PID", xlab="Processor ID's", col=rainbow(max(counts))[counts], 
+          legend = rownames(counts), )
+  testdata <- mydata[mydata$PID == 7015,]
+  head(testdata)
+  print(tail(testdata))
+  #Plot Graphs
+  library(dygraphs)
+  library(xts)
+  datetimes <- seq.POSIXt(as.POSIXct("2015-01-01", tz="GMT"),
+                          +                         as.POSIXct("2015-01-02", tz="GMT"), by="5 min")
+  #values <- rnorm(length(datetimes))
+  series <- xts(testdata$X.CPU, order.by = datetimes, tz="GMT")
+  dygraph(series) %>% 
+    dyOptions(useDataTimezone = TRUE)
+  
+}
